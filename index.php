@@ -1,4 +1,21 @@
 <?php
+$configFile = __DIR__ . '/config.php';
+$installerPath = __DIR__ . '/installer/index.php';
+$needsInstallation = false;
+
+if (!file_exists($configFile)) {
+    $needsInstallation = true;
+} else {
+    $configContent = file_get_contents($configFile);
+    if (strpos($configContent, '{database_name}') !== false || strpos($configContent, '{username_db}') !== false) {
+        $needsInstallation = true;
+    }
+}
+
+if ($needsInstallation && file_exists($installerPath)) {
+    header("Location: installer/");
+    exit;
+}
 $version = file_get_contents('version');
 date_default_timezone_set('Asia/Tehran');
 $new_marzban = isset($new_marzban) ? $new_marzban : false;
@@ -12,6 +29,91 @@ require_once 'function.php';
 require_once 'keyboard.php';
 require_once 'vendor/autoload.php';
 require_once 'panels.php';
+$content = file_get_contents("php://input");
+$update = json_decode($content, true);
+
+if (empty($update)) {
+    header('Content-Type: text/html; charset=utf-8');
+    echo '
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>وضعیت ربات</title>
+        <style>
+            @import url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css");
+            
+            body { 
+                font-family: "Vazirmatn", -apple-system, BlinkMacSystemFont, sans-serif; 
+                background-color: #f0fdf4; /* سبز خیلی روشن */
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                min-height: 100vh; 
+                margin: 0; 
+                padding: 20px;
+                color: #374151;
+            }
+            .card { 
+                background: #fff; 
+                padding: 40px; 
+                border-radius: 16px; 
+                box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+                text-align: center; 
+                max-width: 380px; 
+                width: 100%; 
+                transition: transform 0.3s;
+            }
+            .card:hover {
+                transform: translateY(-5px);
+            }
+            .icon { 
+                font-size: 50px; 
+                margin-bottom: 15px; 
+            }
+            h1 { 
+                color: #15803d; /* سبز تیره */
+                margin: 0 0 15px 0; 
+                font-size: 22px; 
+                font-weight: 800;
+                letter-spacing: -0.5px;
+            }
+            p { 
+                line-height: 1.8; 
+                font-size: 14px; 
+                margin-bottom: 25px;
+                color: #4b5563;
+            }
+            .btn { 
+                display: inline-block; 
+                background-color: #2563eb; 
+                color: white; 
+                text-decoration: none; 
+                padding: 12px 24px; 
+                border-radius: 10px; 
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s;
+                box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+            }
+            .btn:hover { 
+                background-color: #1d4ed8; 
+                transform: translateY(-1px);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="icon">✅</div>
+            <h1>ربات فعال است!</h1>
+            <p>نصب با موفقیت انجام شده و ربات به سرورهای تلگرام متصل است.</p>
+            <a href="https://t.me/' . ($usernamebot ?? "Botgineer") . '" class="btn">ورود به ربات</a>
+        </div>
+    </body>
+    </html>';
+    exit;
+}
 $textbotlang = languagechange('text.json');
 if ($is_bot)
     return;
