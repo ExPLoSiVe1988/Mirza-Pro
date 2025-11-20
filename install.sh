@@ -101,7 +101,7 @@ install_bot() {
     add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
     apt-get update > /dev/null 2>&1
     apt-get install -y php8.2 libapache2-mod-php8.2 php8.2-cli php8.2-common php8.2-mbstring php8.2-curl php8.2-xml php8.2-zip php8.2-mysql php8.2-gd php8.2-bcmath > /dev/null 2>&1
-    
+    update-alternatives --set php /usr/bin/php8.2
     echo -e "${BLUE}Step 3: Database Setup...${NC}"
     mysql -u root <<MYSQL_SCRIPT
 DROP DATABASE IF EXISTS \`$DB_NAME\`;
@@ -197,6 +197,42 @@ MYSQL_SCRIPT
 
     save_config "$DOMAIN" "$BOT_TOKEN" "$ADMIN_TELEGRAM_ID" "$BACKUP_CHAT_ID" "$DB_PASSWORD" "$DB_NAME" "$DB_USER"
     echo -e "\n${GREEN}Installation Complete! You can now use the bot.${NC}"
+}
+
+update_bot() {
+    print_header
+    echo -e "${YELLOW}Updating Bot Source Code...${NC}"
+    
+    INSTALL_DIR="/var/www/mirza_pro"
+    
+    if [ ! -d "$INSTALL_DIR" ]; then
+        echo -e "${RED}Error: Bot folder not found!${NC}"
+        read -p "Press Enter..."
+        return
+    fi
+
+    cd "$INSTALL_DIR" || return
+
+    cp -f config.php /tmp/mirza_config_tmp.php
+
+    chown -R root:root "$INSTALL_DIR"
+    git config --global --add safe.directory "$INSTALL_DIR"
+    
+    git fetch --all
+    git reset --hard origin/main
+    git pull origin main
+
+    if [ -f "/tmp/mirza_config_tmp.php" ]; then
+        cp -f /tmp/mirza_config_tmp.php config.php
+        rm /tmp/mirza_config_tmp.php
+    fi
+
+    chown -R www-data:www-data "$INSTALL_DIR"
+    chmod -R 755 "$INSTALL_DIR"
+    
+    systemctl restart apache2
+
+    echo -e "${GREEN}✅ Update Finished successfully!${NC}"
 }
 
 uninstall_bot() {
@@ -434,19 +470,21 @@ show_menu() {
     print_header
     echo "Select an option from the menu:"
     echo -e " ${GREEN}1.${NC} Install / Re-install Bot"
-    echo -e " ${YELLOW}2.${NC} Backup Management"
-    echo -e " ${BLUE}3.${NC} Renew SSL Certificate"
-    echo -e " ${RED}4.${NC} Uninstall Bot"
-    echo -e " ${NC}5. Exit"
+    echo -e " ${BLUE}2.${NC} Update Bot"
+    echo -e " ${YELLOW}3.${NC} Backup Management"
+    echo -e " ${BLUE}4.${NC} Renew SSL Certificate"
+    echo -e " ${RED}5.${NC} Uninstall Bot"
+    echo -e " ${NC}6. Exit"
     echo ""
-    read -p "Enter your choice [1-5]: " choice
+    read -p "Enter your choice [1-6]: " choice
     
     case $choice in
         1) install_bot ;;
-        2) backup_menu ;;
-        3) echo "Renewing SSL..."; certbot renew; echo "Done." ;;
-        4) uninstall_bot ;;
-        5) exit 0 ;;
+        2) update_bot; read -p "Press Enter..." ;;
+        3) backup_menu ;;
+        4) echo "Renewing SSL..."; certbot renew; echo "Done."; read -p "Press Enter..." ;;
+        5) uninstall_bot ;;
+        6) exit 0 ;;
         *) echo -e "${RED}Invalid option.${NC}" ;;
     esac
     read -p "Press Enter to return to the menu..."
