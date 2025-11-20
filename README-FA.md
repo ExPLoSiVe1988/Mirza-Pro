@@ -1,5 +1,17 @@
 <div align="center">
-  <strong><a href="README.md">English</a></strong> | <strong><a href="README-FA.md">فارسی</a></strong>
+
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/Language-English-blue?style=for-the-badge" alt="English">
+  </a>
+  
+  <a href="README-FA.md">
+    <img src="https://img.shields.io/badge/Language-Persian_(فارسی)-green?style=for-the-badge" alt="Persian">
+  </a>
+
+  <a href="installer/README.md">
+    <img src="https://img.shields.io/badge/Guide-Install_on_Hosting_(cPanel)-orange?style=for-the-badge&logo=cpanel&logoColor=white" alt="راهنمای نصب روی هاست">
+  </a>
+
 </div>
 <br>
 
