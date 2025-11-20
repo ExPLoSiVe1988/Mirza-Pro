@@ -185,7 +185,11 @@ if (in_array($text, $textadmin) || $datain == "admin") {
     $suminvoiceday = $stmt->fetch(PDO::FETCH_ASSOC)['SUM(price_product)'];
     ;
     $paycount = "";
+    if ($statisticsorder > 0) {
     $ratecustomer = round(($statisticsorder / $statisticsorder) * 100, 2);
+        } else {
+    $ratecustomer = 0;
+        }
     $avgbuy_customer = number_format($invoicesum / $statisticsorder);
     $monthe_buy = number_format($suminvoiceday * 30);
     $percent_of_extend = $extendsum != 0 ? round(($extendsum / $invoicesum) * 100, 2) : 0;
