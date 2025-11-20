@@ -4460,7 +4460,6 @@ $text_expie_agent
         } else {
             $free_hdd_space = round($result['free-hdd-space'] / pow(1024, 3), 2);
             $free_memory = round($result['free-memory'] / pow(1024, 3), 2);
-            $free_memory = round($result['free-memory'] / pow(1024, 3), 2);
             $total_hdd_space = round($result['total-hdd-space'] / pow(1024, 3), 2);
             $total_memory = round($result['total-memory'] / pow(1024, 3), 2);
             sendmessage($from_id, "<b>📡 اطلاعات سیستم MikroTik شما:</b>
